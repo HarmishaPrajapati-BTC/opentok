@@ -36,3 +36,39 @@ $('#disablevideopub').on('click', function() {
     enableVideo=true;
   }
 });
+var connectionCount = 0;
+session.on({
+  connectionCreated: function (event) {
+    connectionCount++;
+    if (event.connection.connectionId !== session.connection.connectionId &&
+      event.connection.creationTime < session.connection.creationTime){
+      console.log(connectionCount)
+      if (connectionCount > 1){
+        alert('disconnecting this room is already full')
+        session.disconnect();
+      }
+    }
+  }
+})
+session.connect(token, function(err) {
+});
+// create subscriber
+session.on('streamCreated', function(event) {
+  subscriber = session.subscribe(event.stream, 'subscribers', {
+    insertMode: 'append',
+    fitMode: 'contain',
+    showControls: true,
+    name: 'Herry',
+    style: { nameDisplayMode: "on" }
+    }, handleError);
+  function handleError(error) {
+    if (error) {
+      alert(error.message);
+    }
+  }
+  $('#disablevideosub').on('click', function() {
+    domElement = document.getElementById(subscriber.id);
+    console.log(domElement)
+    subscriber.setStyle({videoDisabledDisplayMode: 'on'});
+  })
+});
