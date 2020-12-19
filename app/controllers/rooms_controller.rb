@@ -1,18 +1,20 @@
 class RoomsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_room, only: %i[show edit update destroy recorded_session start_archive delete_archive stop_archive]
-  before_action :set_opentok, only: %i[show recorded_session start_archive delete_archive stop_archive]
+  before_action :set_room, only: %i[show edit update destroy start_session generate_token join_session recorded_session start_archive delete_archive stop_archive]
+  before_action :set_opentok, only: %i[show create recorded_session start_session generate_token join_session start_archive delete_archive stop_archive]
 
-  # GET /rooms
-  # GET /rooms.json
   def index
     @rooms = Room.all
   end
 
-  # GET /rooms/1
-  # GET /rooms/1.json
-  def show
-    @token = @opentok.generate_token @room.vonage_session_id, { name: current_user.name }
+  def show; end
+
+  def start_session
+    @token = generate_token
+  end
+
+  def join_session
+    @token = generate_token
   end
 
   def start_archive
@@ -35,19 +37,16 @@ class RoomsController < ApplicationController
     redirect_to @archive&.url
   end
 
-  # GET /rooms/new
   def new
     @room = Room.new
   end
 
-  # GET /rooms/1/edit
   def edit; end
 
-  # POST /rooms
-  # POST /rooms.json
   def create
     @room = Room.new(room_params)
-
+    session = @opentok.create_session media_mode: :routed
+    @room.update(vonage_session_id: session.session_id)
     respond_to do |format|
       if @room.save
         format.html { redirect_to @room, notice: 'Room was successfully created.' }
@@ -59,8 +58,6 @@ class RoomsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /rooms/1
-  # PATCH/PUT /rooms/1.json
   def update
     respond_to do |format|
       if @room.update(room_params)
@@ -73,8 +70,6 @@ class RoomsController < ApplicationController
     end
   end
 
-  # DELETE /rooms/1
-  # DELETE /rooms/1.json
   def destroy
     @room.destroy
     respond_to do |format|
@@ -86,21 +81,13 @@ class RoomsController < ApplicationController
   private
 
   def set_opentok
-    tries = 5
-    begin
-      @opentok = OpenTok::OpenTok.new('47001474', 'd8cb7942d6ce558196e6af111703ce7a9420de33')
-      logger.debug 'opentok connected.'
-    rescue Errno::ETIMEDOUT => e
-      log.error e
-      tries -= 1
-      if tries.positive?
-        logger.debug 'retrying opentok.new...'
-        retry
-      else
-        logger.debug 'opentok.new timed out...'
-        puts "ERROR: #{e.message}"
-      end
-    end
+    @api_key = '47001474'
+    @api_secret = 'd8cb7942d6ce558196e6af111703ce7a9420de33'
+    @opentok = OpenTok::OpenTok.new @api_key, @api_secret
+  end
+
+  def generate_token
+    @opentok.generate_token @room.vonage_session_id
   end
 
   # Use callbacks to share common setup or constraints between actions.

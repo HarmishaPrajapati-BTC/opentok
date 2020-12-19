@@ -12,14 +12,11 @@
   <dt>Name:</dt>
   <dd><%= @room.name %></dd>
 </dl>
+<div id='publisher'></div>
+<div id='subscribers'></div>
+<td><%= link_to 'Start session', room_start_session_path(@room), remote: true %></td>
+<td><%= link_to 'Join session', room_join_session_path(@room), remote: true %></td>
 <td><%= link_to 'Start recording', room_start_archive_path(@room), remote: true %></td>
 <td><%= link_to 'Stop recording', room_stop_archive_path(@room), remote: true %></td>
-
-<div id="videos"
-     data-controller="vonage"
-     data-vonage-api-key="47001474"
-     data-vonage-session-id="<%= @room.vonage_session_id %>"
-     data-vonage-token="<%= @token %>"
-     data-vonage-name="<%= current_user.name %>"
-     >
-</div>
+<button id='disablevideopub'>Disable publisher camera</button>
+<button id='disablevideosub'>Disable subscriber camera</button>
