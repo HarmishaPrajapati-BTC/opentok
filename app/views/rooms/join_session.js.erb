@@ -2,7 +2,38 @@ API_KEY = '47001474';
 var sessionId = "<%= @room.vonage_session_id %>"
 var token = "<%= @token %>"
 var session = OT.initSession(API_KEY, sessionId);
+var publisher = OT.initPublisher('publisher', {
+  insertMode: 'append',
+  fitMode: 'contain',
+  name: 'John'
+}, handleError);
 
+// Connect to the session
+session.connect(token, function(error) {
+  // If the connection is successful, initialize a publisher and publish to the session
+  if (error) {
+    handleError(error);
+  } else {
+    session.publish(publisher, handleError);
+  }
+});
+function handleError(error) {
+  if (error) {
+    alert(error.message);
+  }
+}
+var enableVideo=true;
+$('#disablevideopub').on('click', function() {
+  if(enableVideo)
+  {
+    publisher.publishVideo(false);
+    enableVideo=false;
+  } else
+  {
+    publisher.publishVideo(true);
+    enableVideo=true;
+  }
+});
 var connectionCount = 0;
 session.on({
   connectionCreated: function (event) {
@@ -38,36 +69,4 @@ session.on('streamCreated', function(event) {
     console.log(domElement)
     subscriber.setStyle({videoDisabledDisplayMode: 'on'});
   })
-});
-var publisher = OT.initPublisher('publisher', {
-  insertMode: 'append',
-  fitMode: 'contain',
-  name: 'John'
-}, handleError);
-
-// Connect to the session
-session.connect(token, function(error) {
-  // If the connection is successful, initialize a publisher and publish to the session
-  if (error) {
-    handleError(error);
-  } else {
-    session.publish(publisher, handleError);
-  }
-});
-function handleError(error) {
-  if (error) {
-    alert(error.message);
-  }
-}
-var enableVideo=true;
-$('#disablevideopub').on('click', function() {
-  if(enableVideo)
-  {
-    publisher.publishVideo(false);
-    enableVideo=false;
-  } else
-  {
-    publisher.publishVideo(true);
-    enableVideo=true;
-  }
 });
