@@ -1,22 +1,23 @@
-<div class="page-header">
-  <%= link_to rooms_path, class: 'btn btn-default' do %>
-    All Rooms
-  <% end %>
-  <%= link_to edit_room_path(@room), class: 'btn btn-primary' do %>
-    Edit
-  <% end %>
+<div class='container'>
   <h1>Show room</h1>
-</div>
+  <div class="page-header mt-3">
+    <%= link_to 'Back', rooms_path, class: 'btn btn-primary' %>
+    <td><%= link_to 'Start recording', room_start_archive_path(@room), remote: true, class: 'btn btn-success' %></td>
+    <td><%= link_to 'Stop recording', room_stop_archive_path(@room), remote: true, class: 'btn btn-danger' %></td>
+    <input id='disablevideo'type="checkbox" data-toggle="toggle"> Turn Off My Camera
+  </div><br>
 
-<dl class="dl-horizontal">
-  <dt>Name:</dt>
-  <dd><%= @room.name %></dd>
-</dl>
-<div id='publisher'></div>
-<div id='subscribers'></div>
-<td><%= link_to 'Start session', room_start_session_path(@room), remote: true %></td>
-<td><%= link_to 'Join session', room_join_session_path(@room), remote: true %></td>
-<td><%= link_to 'Start recording', room_start_archive_path(@room), remote: true %></td>
-<td><%= link_to 'Stop recording', room_stop_archive_path(@room), remote: true %></td>
-<button id='disablevideopub'>Disable publisher camera</button>
-<button id='disablevideosub'>Disable subscriber camera</button>
+  <dl class="dl-horizontal">
+    <dt>Name:</dt>
+    <dd><%= @room.name %></dd>
+  </dl>
+  <div>
+    <%= link_to 'Start session', room_start_session_path(@room), remote: true, class: 'btn btn-success' %>
+    <%= link_to 'Join session', room_join_session_path(@room), remote: true, class: 'btn btn-warning' %>
+  </div><br>
+</div>
+<div class='videos'>
+  <div id='publisher'></div>
+  <div id='subscribers'></div>
+</div>
+<script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
